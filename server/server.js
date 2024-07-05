@@ -2,7 +2,13 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import ACTIONS from './Actions.js'; // Adjust the path as needed
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, '../dist');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,8 +22,12 @@ const io = new Server(server, {
 app.use(cors());
 
 // Serve static files from the '../dist' directory
-app.use(express.static('../dist/index.html'));
+app.use(express.static(distPath));
 
+// Serve index.html for all routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 
 const userSocketMap = {};
 
